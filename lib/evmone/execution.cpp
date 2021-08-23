@@ -11,14 +11,18 @@ namespace evmone
 evmc_result execute(evmc_vm* /*unused*/, const evmc_host_interface* host, evmc_host_context* ctx,
     evmc_revision rev, const evmc_message* msg, const uint8_t* code, size_t code_size) noexcept
 {
+    printf("[evmone] log tag: 08-23 11:26"); // pre-version 01:36
+    printf("[evmone.execute] analyze code");
     const auto analysis = analyze(rev, code, code_size);
 
+    printf("[evmone.execute] make_unique<execution_state>");
     auto state =
         std::make_unique<execution_state>(*msg, rev, *host, ctx, code, code_size, analysis);
-
+    printf("[evmone.execute] execute instructions");
     const auto* instr = &state->analysis->instrs[0];
     while (instr != nullptr)
         instr = instr->fn(instr, *state);
+    printf("[evmone.execute] execute instructions finished");
 
     const auto gas_left =
         (state->status == EVMC_SUCCESS || state->status == EVMC_REVERT) ? state->gas_left : 0;

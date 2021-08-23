@@ -82,6 +82,16 @@ public:
     evm_memory& operator=(const evm_memory&) = delete;
 
     uint8_t& operator[](size_t idx) noexcept {
+        static char debug_buf[1024];
+        sprintf(debug_buf, "[evmone] evm_memory[%ld]", idx);
+        printf(debug_buf);
+        // sprintf(debug_buf, "[evmone] evm_memory => begin = %ld, used_ptr = %ld, size = %ld", 
+        //     begin - m_memory,
+        //     used_ptr - m_memory,
+        //     used_ptr - begin);
+        // printf(debug_buf);
+        // printf("[evmone] ===evm_memory===");
+
         return m_memory[static_cast<size_t>(begin - m_memory) + idx];
     }
 

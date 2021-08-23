@@ -28,13 +28,16 @@ template <evmc_status_code InstrFn(ExecutionState&)>
 const instruction* op(const instruction* instr, execution_state& state) noexcept
 {
     const auto status_code = InstrFn(state);
-    if (status_code != EVMC_SUCCESS)
+    if (status_code != EVMC_SUCCESS) {
+        printf("[evmone] op => status_code != EVMC_SUCCESS => exit(status_code)");
         return state.exit(status_code);
+    }
     return ++instr;
 }
 
 const instruction* op_stop(const instruction*, execution_state& state) noexcept
 {
+    printf("[evmone] exit at op_stop");
     return state.exit(EVMC_SUCCESS);
 }
 
@@ -44,8 +47,10 @@ const instruction* op_sstore(const instruction* instr, execution_state& state) n
     state.gas_left += gas_left_correction;
 
     const auto status = sstore(state);
-    if (status != EVMC_SUCCESS)
+    if (status != EVMC_SUCCESS) {
+        printf("[evmone] exit at op_sstore");
         return state.exit(status);
+    }
 
     if ((state.gas_left -= gas_left_correction) < 0)
         return state.exit(EVMC_OUT_OF_GAS);
@@ -128,8 +133,10 @@ const instruction* op_log(const instruction* instr, execution_state& state) noex
 {
     constexpr auto num_topics = LogOp - OP_LOG0;
     const auto status_code = log(state, num_topics);
-    if (status_code != EVMC_SUCCESS)
+    if (status_code != EVMC_SUCCESS) {
+        printf("[evmone] exit at op_log");
         return state.exit(status_code);
+    }
     return ++instr;
 }
 
@@ -150,6 +157,7 @@ const instruction* op_return(const instruction*, execution_state& state) noexcep
     state.output_size = static_cast<size_t>(size);
     if (state.output_size != 0)
         state.output_offset = static_cast<size_t>(offset);
+    printf("[evmone] exit at op_return");
     return state.exit(status_code);
 }
 
@@ -160,8 +168,10 @@ const instruction* op_call(const instruction* instr, execution_state& state) noe
     state.gas_left += gas_left_correction;
 
     const auto status = call<Kind, Static>(state);
-    if (status != EVMC_SUCCESS)
+    if (status != EVMC_SUCCESS) {
+        printf("[evmone] exit at op_call");
         return state.exit(status);
+    }
 
     if ((state.gas_left -= gas_left_correction) < 0)
         return state.exit(EVMC_OUT_OF_GAS);
@@ -176,8 +186,10 @@ const instruction* op_create(const instruction* instr, execution_state& state) n
     state.gas_left += gas_left_correction;
 
     const auto status = create<Kind>(state);
-    if (status != EVMC_SUCCESS)
+    if (status != EVMC_SUCCESS) {
+        printf("[evmone] exit at op_create");
         return state.exit(status);
+    }
 
     if ((state.gas_left -= gas_left_correction) < 0)
         return state.exit(EVMC_OUT_OF_GAS);
@@ -192,6 +204,7 @@ const instruction* op_undefined(const instruction*, execution_state& state) noex
 
 const instruction* op_selfdestruct(const instruction*, execution_state& state) noexcept
 {
+    printf("[evmone] exit at op_selfdestruct");
     return state.exit(selfdestruct(state));
 }
 

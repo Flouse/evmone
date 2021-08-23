@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "*.njk": "nunjucks",
+        "array": "cpp"
+    }
+}

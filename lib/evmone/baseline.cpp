@@ -7,6 +7,7 @@
 #include "instructions.hpp"
 #include <evmc/instructions.h>
 #include <memory>
+#include "instruction_traits.hpp"
 
 namespace evmone
 {
@@ -116,6 +117,10 @@ evmc_result baseline_execute(ExecutionState& state) noexcept
     {
         const auto op = *pc;
 
+        static char debug_buf[1024];
+        sprintf(debug_buf, "[evmone] baseline_execute %s (opcode = %d)", instr::traits[op].name, op);
+        printf(debug_buf);
+        
         const auto status = check_requirements(instruction_names, instruction_metrics, state, op);
         if (status != EVMC_SUCCESS)
         {
@@ -709,6 +714,7 @@ evmc_result baseline_execute(ExecutionState& state) noexcept
             break;
         }
         case OP_REVERT:
+            printf("[evmone.baseline] case OP_REVERT => op_return<EVMC_REVERT>(state)");
             op_return<EVMC_REVERT>(state);
             goto exit;
         case OP_INVALID:
@@ -725,6 +731,7 @@ evmc_result baseline_execute(ExecutionState& state) noexcept
     }
 
 exit:
+    printf("[evmone.baseline] exit");
     const auto gas_left =
         (state.status == EVMC_SUCCESS || state.status == EVMC_REVERT) ? state.gas_left : 0;
 

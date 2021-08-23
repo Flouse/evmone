@@ -7,8 +7,21 @@
 #include <ethash/keccak.hpp>
 #include <evmc/instructions.h>
 
+#include <stddef.h>
+#include <stdlib.h>
+
+
 namespace evmone
 {
+static char evmone_debug_buf[512];
+// inline void evmone_debug_print(const char* fmt, ...) {
+//     va_list args;
+//     va_start(args, fmt);
+//     vsnprintf(evmone_debug_buf, sizeof(evmone_debug_buf), fmt, args);
+//     va_end(args);
+//     printf(evmone_debug_buf);
+// }
+
 constexpr auto max_buffer_size = std::numeric_limits<uint32_t>::max();
 
 /// The size of the EVM 256-bit word.
@@ -256,6 +269,8 @@ inline void sar(evm_stack& stack) noexcept
 
 inline evmc_status_code sha3(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction sha3");
+
     const auto index = state.stack.pop();
     auto& size = state.stack.top();
 
@@ -327,6 +342,8 @@ inline void calldatasize(ExecutionState& state) noexcept
 
 inline evmc_status_code calldatacopy(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction calldatacopy");
+
     const auto mem_index = state.stack.pop();
     const auto input_index = state.stack.pop();
     const auto size = state.stack.pop();
@@ -361,6 +378,7 @@ inline void codesize(ExecutionState& state) noexcept
 inline evmc_status_code codecopy(ExecutionState& state) noexcept
 {
     // TODO: Similar to calldatacopy().
+    printf("[evmone] instruction codecopy");
 
     const auto mem_index = state.stack.pop();
     const auto input_index = state.stack.pop();
@@ -403,6 +421,8 @@ inline void extcodesize(ExecutionState& state) noexcept
 
 inline evmc_status_code extcodecopy(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction extcodecopy");
+
     const auto addr = intx::be::trunc<evmc::address>(state.stack.pop());
     const auto mem_index = state.stack.pop();
     const auto input_index = state.stack.pop();
@@ -434,6 +454,8 @@ inline void returndatasize(ExecutionState& state) noexcept
 
 inline evmc_status_code returndatacopy(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction returndatacopy");
+
     const auto mem_index = state.stack.pop();
     const auto input_index = state.stack.pop();
     const auto size = state.stack.pop();
@@ -529,17 +551,28 @@ inline void pop(evm_stack& stack) noexcept
 
 inline evmc_status_code mload(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction mload");
+
     auto& index = state.stack.top();
 
     if (!check_memory(state, index, 32))
         return EVMC_OUT_OF_GAS;
-
+    
+    int offset = sprintf(evmone_debug_buf, "load<uint256>: ");
+    for (size_t i = 0; i < 32; i++)
+    {
+        offset += sprintf(evmone_debug_buf + offset, "%d, ", state.memory[static_cast<size_t>(index)+i]);
+    }
+    printf(evmone_debug_buf);
+    
     index = intx::be::unsafe::load<uint256>(&state.memory[static_cast<size_t>(index)]);
     return EVMC_SUCCESS;
 }
 
 inline evmc_status_code mstore(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction mstore");
+
     const auto index = state.stack.pop();
     const auto value = state.stack.pop();
 
@@ -552,6 +585,8 @@ inline evmc_status_code mstore(ExecutionState& state) noexcept
 
 inline evmc_status_code mstore8(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction mstore8");
+
     const auto index = state.stack.pop();
     const auto value = state.stack.pop();
 
@@ -564,6 +599,8 @@ inline evmc_status_code mstore8(ExecutionState& state) noexcept
 
 inline void sload(ExecutionState& state) noexcept
 {
+    printf("[evmone] instruction sload");
+
     auto& x = state.stack.top();
     x = intx::be::load<uint256>(
         state.host.get_storage(state.msg->destination, intx::be::store<evmc::bytes32>(x)));
@@ -617,6 +654,9 @@ inline evmc_status_code sstore(ExecutionState& state) noexcept
 
 inline void msize(ExecutionState& state) noexcept
 {
+    sprintf(evmone_debug_buf, "[evmone] instruction msize state.memory.size = %ld", state.memory.size());
+    printf(evmone_debug_buf);
+
     state.stack.push(state.memory.size());
 }
 
@@ -641,6 +681,8 @@ inline void swap(evm_stack& stack) noexcept
 
 inline evmc_status_code log(ExecutionState& state, size_t num_topics) noexcept
 {
+    printf("[evmone] instruction log");
+
     if (state.msg->flags & EVMC_STATIC)
         return EVMC_STATIC_MODE_VIOLATION;
 

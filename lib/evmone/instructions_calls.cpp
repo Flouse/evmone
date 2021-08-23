@@ -9,6 +9,8 @@ namespace evmone
 template <evmc_call_kind Kind, bool Static>
 evmc_status_code call(ExecutionState& state) noexcept
 {
+    printf("[evmone] call(ExecutionState& state)");
+
     const auto gas = state.stack.pop();
     const auto dst = intx::be::trunc<evmc::address>(state.stack.pop());
     const auto value = (Static || Kind == EVMC_DELEGATECALL) ? 0 : state.stack.pop();

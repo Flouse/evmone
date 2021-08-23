@@ -65,6 +65,10 @@ struct execution_state : ExecutionState
     /// Terminates the execution with the given status code.
     const instruction* exit(evmc_status_code status_code) noexcept
     {
+        static char debug_buf[1024];
+        sprintf(debug_buf, "[evmone] ExecutionState exit, status_code =%d", status_code);
+        printf(debug_buf);
+
         status = status_code;
         return nullptr;
     }

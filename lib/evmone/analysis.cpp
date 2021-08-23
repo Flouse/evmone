@@ -5,6 +5,7 @@
 #include "analysis.hpp"
 #include "opcodes_helpers.h"
 #include <cassert>
+#include "instruction_traits.hpp"
 
 namespace evmone
 {
@@ -60,6 +61,11 @@ code_analysis analyze(evmc_revision rev, const uint8_t* code, size_t code_size) 
     while (code_pos != code_end)
     {
         const auto opcode = *code_pos++;
+
+        // static char debug_buf[1024];
+        // sprintf(debug_buf, "[evmone] analyze %s (opcode = %d)", instr::traits[opcode].name, opcode);
+        // printf(debug_buf);
+
         const auto& opcode_info = op_tbl[opcode];
 
         block.stack_req = std::max(block.stack_req, opcode_info.stack_req - block.stack_change);
@@ -84,11 +90,12 @@ code_analysis analyze(evmc_revision rev, const uint8_t* code, size_t code_size) 
         bool is_terminator = false;  // A flag whenever this is a block terminating instruction.
         switch (opcode)
         {
+        case OP_REVERT:
+            // printf("[evmone.analyze] switch (opcode) -> case OP_REVERT");
         case OP_JUMP:
         case OP_JUMPI:
         case OP_STOP:
         case OP_RETURN:
-        case OP_REVERT:
         case OP_SELFDESTRUCT:
             is_terminator = true;
             break;
