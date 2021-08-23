@@ -104,6 +104,9 @@ public:
     }
 
     bool resize(size_t new_size) {
+        // make sure that the new memory is clean
+        memset(used_ptr, 0, begin + new_size - used_ptr);
+
         used_ptr = begin + new_size;
 
         // out of bounds
@@ -117,8 +120,6 @@ public:
     }
 
     void clear() noexcept {
-        printf("[evmone.evm_memory] clear()");
-        while (used_ptr-- > begin) *used_ptr = 0;
         used_ptr = begin;
     }
     ~evm_memory() {
@@ -158,7 +159,6 @@ struct ExecutionState
         const evmc_host_interface& host_interface, evmc_host_context* host_ctx,
         const uint8_t* code_ptr, size_t code_size) noexcept
     {
-        printf("[evmone] ExecutionState::reset");
         gas_left = message.gas;
         stack.clear();
         memory.clear();
