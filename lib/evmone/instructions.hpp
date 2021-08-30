@@ -348,7 +348,7 @@ inline evmc_status_code calldatacopy(ExecutionState& state) noexcept
         std::memcpy(&state.memory[dst], &state.msg->input_data[src], copy_size);
 
     if (s - copy_size > 0)
-        std::memset(&state.memory[dst + copy_size], 0, s - copy_size);
+        fast_memset(&state.memory[dst + copy_size], 0, s - copy_size);
 
     return EVMC_SUCCESS;
 }
@@ -384,7 +384,7 @@ inline evmc_status_code codecopy(ExecutionState& state) noexcept
         std::memcpy(&state.memory[dst], &state.code[src], copy_size);
 
     if (s - copy_size > 0)
-        std::memset(&state.memory[dst + copy_size], 0, s - copy_size);
+        fast_memset(&state.memory[dst + copy_size], 0, s - copy_size);
 
     return EVMC_SUCCESS;
 }
@@ -422,7 +422,7 @@ inline evmc_status_code extcodecopy(ExecutionState& state) noexcept
     auto data = s != 0 ? &state.memory[dst] : nullptr;
     auto num_bytes_copied = state.host.copy_code(addr, src, data, s);
     if (s - num_bytes_copied > 0)
-        std::memset(&state.memory[dst + num_bytes_copied], 0, s - num_bytes_copied);
+        fast_memset(&state.memory[dst + num_bytes_copied], 0, s - num_bytes_copied);
 
     return EVMC_SUCCESS;
 }

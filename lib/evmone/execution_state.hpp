@@ -8,6 +8,9 @@
 #include <string>
 #include <vector>
 
+// The faster version of memset in polyjuice_utils.h
+void *fast_memset(void*, int, size_t);
+
 namespace evmone
 {
 using uint256 = intx::uint256;
@@ -113,7 +116,7 @@ public:
         }
 
         // make sure that the new memory is clean
-        memset(used_ptr, 0, new_ptr - used_ptr);
+        fast_memset(used_ptr, 0, new_ptr - used_ptr);
         used_ptr = new_ptr;
         return true;
     }
