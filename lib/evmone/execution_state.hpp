@@ -10,6 +10,7 @@
 
 // The faster version of memset in polyjuice_utils.h
 void *fast_memset(void*, int, size_t);
+void *_smt_fast_memcpy(void*, const void*, size_t);
 
 namespace evmone
 {

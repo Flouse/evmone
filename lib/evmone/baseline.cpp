@@ -49,7 +49,7 @@ inline const uint8_t* load_push(
         return code_end;
 
     uint8_t buffer[Len];
-    std::memcpy(buffer, code, Len);
+    _smt_fast_memcpy(buffer, code, Len);
     state.stack.push(intx::be::load<intx::uint256>(buffer));
     return code + Len;
 }

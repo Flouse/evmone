@@ -345,7 +345,7 @@ inline evmc_status_code calldatacopy(ExecutionState& state) noexcept
         return EVMC_OUT_OF_GAS;
 
     if (copy_size > 0)
-        std::memcpy(&state.memory[dst], &state.msg->input_data[src], copy_size);
+        _smt_fast_memcpy(&state.memory[dst], &state.msg->input_data[src], copy_size);
 
     if (s - copy_size > 0)
         fast_memset(&state.memory[dst + copy_size], 0, s - copy_size);
@@ -381,7 +381,7 @@ inline evmc_status_code codecopy(ExecutionState& state) noexcept
 
     // TODO: Add unit tests for each combination of conditions.
     if (copy_size > 0)
-        std::memcpy(&state.memory[dst], &state.code[src], copy_size);
+        _smt_fast_memcpy(&state.memory[dst], &state.code[src], copy_size);
 
     if (s - copy_size > 0)
         fast_memset(&state.memory[dst + copy_size], 0, s - copy_size);
@@ -456,7 +456,7 @@ inline evmc_status_code returndatacopy(ExecutionState& state) noexcept
         return EVMC_OUT_OF_GAS;
 
     if (s > 0)
-        std::memcpy(&state.memory[dst], &state.return_data[src], s);
+        _smt_fast_memcpy(&state.memory[dst], &state.return_data[src], s);
 
     return EVMC_SUCCESS;
 }
