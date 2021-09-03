@@ -4,6 +4,7 @@
 
 #include <evmone/analysis.hpp>
 #include <evmone/execution_state.hpp>
+#include <evmone/execution_state.cpp>
 #include <gtest/gtest.h>
 #include <type_traits>
 

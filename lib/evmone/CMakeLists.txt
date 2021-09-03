@@ -9,6 +9,8 @@ find_package(intx CONFIG REQUIRED)
 
 add_library(evmone
     ${include_dir}/evmone/evmone.h
+    execution_state.cpp
+    execution_state.hpp
     analysis.cpp
     analysis.hpp
     baseline.cpp
